@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<controls>
+	<k_cluster>5</k_cluster>
+	<sample_N>3000</sample_N>
+	<use_ROI>0</use_ROI>
+	<ignore_near-white>1</ignore_near-white>
+	<ignore_near-black>1</ignore_near-black>
+</controls>
