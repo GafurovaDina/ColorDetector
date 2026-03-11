@@ -1,131 +1,181 @@
+
 #include "ofApp.h"
+#include <algorithm>
 
 //--------------------------------------------------------------
-void ofApp::setup(){
+void ofApp::setup() {
 	ofSetWindowTitle("Color detector");
+
 	gui.setup("controls");
-	gui.setPosition(15,15);
-	
-	kClusters.set("k cluster", 5,2,10);
-	sampleN.set("sample N", 3000,5000,100000);
+	gui.setPosition(15, 15);
+
+	kClusters.set("k clusters", 5, 2, 10);
 	useROI.set("use ROI", false);
+	sampleN.set("Sample N", 3000, 5000, 100000);
+	showOverlay.set("Show overlay", true);
 
-		gui.add(kClusters);
-		gui.add(sampleN);
-		gui.add(useROI);
+	gui.add(kClusters);
+	gui.add(sampleN);
+	gui.add(useROI);
+	gui.add(showOverlay);
+
+	btnExtract.addListener(this, &ofApp::onExtractPalette);
+	gui.add(btnExtract.setup("extract palette"));
+
 	
-
-		btnExtract.addListener(this, &ofApp::extractPalette);
-		gui.add(btnExtract.setup("extract palette"));
-
-		roi.set(100, 100, 300, 200);
+	roiSel.setDefault(100, 100, 300, 200);
 }
 
 //--------------------------------------------------------------
-void ofApp::update(){
-
-}
+void ofApp::update() {}
 
 //--------------------------------------------------------------
-void ofApp::draw(){
+void ofApp::draw() {
 	ofBackground(20);
 
-		if (hasImage) {
-			img.draw(0, 0);
+	if (!imgMgr.isLoaded()) {
+		ofSetColor(220);
+		ofDrawBitmapString("Press L to load an image.", 20, 40);
+		ofSetColor(255);
+		gui.draw();
+		return;
+	}
 
-			if (useROI) {
-				ofNoFill();
-				ofSetColor(255);
-				ofDrawRectangle(roi);
-				ofFill();
-			}
-			if (hasHover) {
-						ofSetColor(0, 180);
-						ofDrawRectangle(15, ofGetHeight() - 100, 320, 85);
+	
+	imgMgr.draw(0, 0);
 
-						ofSetColor(255);
-				
-						std::string rgbText =
-							"RGB: " + ofToString((int)hoverColor.r) + ", " + ofToString((int)hoverColor.g) + ", " + ofToString((int)hoverColor.b);
-						ofDrawBitmapString(rgbText, 25, ofGetHeight() - 75);
-				
-				ofSetColor(hoverColor);
-				ofDrawRectangle(280, ofGetHeight() - 62, 45, 40);
-				
-				ofSetColor(255);
-				ofColor hsvColor = hoverColor;
-				float hue = hsvColor.getHue();
-				float saturation = hsvColor.getSaturation();
-				float brightness = hsvColor.getBrightness();
-						
-						std:: string hsvText =
-							"HSV: " + ofToString((int)hue) + ", " + ofToString((int)saturation) + ", " + ofToString((int)brightness);
-						ofDrawBitmapString(hsvText, 25, ofGetHeight() - 55);
-				
-				ofSetColor(hoverColor);
-				ofDrawRectangle(280, ofGetHeight() - 92, 45, 60);
-				
-					}
-				} else {
-					ofSetColor(220);
-					ofDrawBitmapString("Press L to load an image (or implement drag & drop).", 300, 30);
-				}
 
-				ofSetColor(255);
-				gui.draw();
-			}
+	roiSel.setEnabled(useROI);
+	roiSel.draw();
+	
+	if (showOverlay && clusterer.hasOverlay()) {
+		ofRectangle roiUsed = clusterer.getUsedROI();
+		ofSetColor(255);
+		clusterer.getOverlay().draw(roiUsed.getX(), roiUsed.getY());
+	}
 
+	
+	if (showOverlay && clusterer.hasOverlay()) {
+		ofRectangle roiUsed = clusterer.getUsedROI(); //
+
+	
+		ofSetColor(255);
+		clusterer.getOverlay().draw(roiUsed.getX(), roiUsed.getY());
+	}
+
+	
+	if (sampler.hasHover()) {
+		ofPushStyle();
+
+		ofSetColor(0, 180);
+		ofDrawRectangle(15, ofGetHeight() - 100, 420, 85);
+
+		ofColor c = sampler.getRGB();
+		std::string rgbText =
+			"RGB: " + ofToString((int)c.r) + ", " + ofToString((int)c.g) + ", " + ofToString((int)c.b);
+
+		std::string hsvText =
+			"HSV: " + ofToString(sampler.getHue()) + ", " +
+			ofToString(sampler.getSaturation()) + ", " +
+			ofToString(sampler.getBrightness());
+
+		std::string hexText = "HEX: " + sampler.getHEX();
+
+		ofSetColor(255);
+		ofDrawBitmapString(rgbText, 25, ofGetHeight() - 75);
+		ofDrawBitmapString(hsvText, 25, ofGetHeight() - 55);
+		ofDrawBitmapString(hexText, 25, ofGetHeight() - 35);
+
+		ofSetColor(c);
+		ofDrawRectangle(360, ofGetHeight() - 92, 60, 60);
+
+		ofPopStyle();
+	}
+
+
+	const auto& pal = clusterer.getPalette();
+	if (!pal.empty()) {
+		float x0 = ofGetWidth() - 230;
+		float y0 = 15;
+		float sw = 40;
+		float sh = 22;
+
+		ofPushStyle();
+		ofSetColor(255);
+		ofDrawBitmapString("palette (%):", x0, y0 + 10);
+
+		for (size_t i = 0; i < pal.size(); i++) {
+			float y = y0 + 20 + (float)i * (sh + 6);
+
+			ofSetColor(pal[i].color);
+			ofDrawRectangle(x0, y, sw, sh);
+
+			ofSetColor(255);
+			ofDrawBitmapString(ofToString(pal[i].percent, 1) + "%", x0 + sw + 10, y + 16);
+		}
+		ofPopStyle();
+	}
+
+
+	ofSetColor(255);
+	gui.draw();
+}
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 	if (key == 'l' || key == 'L') {
-			ofFileDialogResult r = ofSystemLoadDialog("Select an image");
-			if (r.bSuccess) {
-				hasImage = img.load(r.getPath());
-				hasHover = false;
+		if (imgMgr.LoadFromDialog()) {
+			
+			roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
 		}
-		}
-}
+	}
 
+		if (key == 'l' || key == 'L') {
+			if (imgMgr.LoadFromDialog()) {
+				roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
+			}
+		}
+	if (key == 'o' || key == 'O') {
+		showOverlay = !showOverlay;
+	}
+	}
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y ){
-	if (!hasImage) return;
-	   if (x < 0 || y < 0 || x >= img.getWidth() || y >= img.getHeight()) {
-		   hasHover = false;
-		   return;
-	   }
-	   hoverColor = img.getColor(x, y);
-	   hasHover = true;
+void ofApp::mouseMoved(int x, int y) {
+	if (!imgMgr.isLoaded()) return;
+	sampler.updateHover(imgMgr.getImage(), x, y);
 }
-
 
 //--------------------------------------------------------------
-void ofApp::mousePressed(int x, int y, int button){
-	if (!useROI) return;
-		if (roi.inside(x, y)) {
-			draggingROI = true;
-			roiStart.set(x, y);
-		} else {
-			// start a new ROI from click
-			draggingROI = true;
-			roiStart.set(x, y);
-			roi.set(x, y, 1, 1);
-		}
+void ofApp::mousePressed(int x, int y, int button) {
+	if (!imgMgr.isLoaded()) return;
+
+	roiSel.setEnabled(useROI);
+	roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
+	roiSel.mousePressed(x, y);
 }
 
+//--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button) {
-	if (!useROI || !draggingROI) return;
-	float x0 = roiStart.x, y0 = roiStart.y;
-	roi.set(std::min(x0, (float)x), std::min(y0, (float)y), std::abs(x - x0), std::abs(y - y0));
+	roiSel.mouseDragged(x, y);
 }
 
-void ofApp::extractPalette() {
-	if (!hasImage) return;
-
-	// placeholder for now
-	ofLogNotice() << "Extract palette with k=" << kClusters
-				  << " sampleN=" << sampleN
-				  << " useROI=" << (useROI ? "true" : "false");
+//--------------------------------------------------------------
+void ofApp::mouseReleased(int x, int y, int button) {
+	roiSel.mouseReleased();
 }
 
+//--------------------------------------------------------------
+void ofApp::onExtractPalette() {
+	if (!imgMgr.isLoaded()) return;
+
+	clusterer.setK(kClusters);
+	clusterer.setSampleN(sampleN);
+
+
+	ofRectangle roi = (useROI && roiSel.hasValidROI())
+						? roiSel.getROI()
+						: ofRectangle(0, 0, imgMgr.width(), imgMgr.height());
+
+	clusterer.compute(imgMgr.getImage(), roi);
+}

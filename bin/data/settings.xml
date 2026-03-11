@@ -5,4 +5,7 @@
 	<use_ROI>0</use_ROI>
 	<ignore_near-white>1</ignore_near-white>
 	<ignore_near-black>1</ignore_near-black>
+	<k_clusters>5</k_clusters>
+	<Sample_N>3000</Sample_N>
+	<Original_Image>1</Original_Image>
 </controls>
