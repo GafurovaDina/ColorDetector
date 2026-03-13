@@ -1,181 +1,243 @@
-
 #include "ofApp.h"
-#include <algorithm>
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-	ofSetWindowTitle("Color detector");
+	ofSetWindowTitle("Color Detector - Live Camera");
+	ofSetFrameRate(30);
+	ofBackground(20);
+
+	imgMgr.setupCamera(camWidth, camHeight);
 
 	gui.setup("controls");
 	gui.setPosition(15, 15);
 
-	kClusters.set("k clusters", 5, 2, 10);
-	useROI.set("use ROI", false);
-	sampleN.set("Sample N", 3000, 5000, 100000);
-	showOverlay.set("Show overlay", true);
+	hueRange.set("Hue Range", 10, 1, 40);
+	satRange.set("Sat Range", 60, 1, 120);
+	valRange.set("Val Range", 60, 1, 120);
+	minArea.set("Min Area", 500, 50, 10000);
+	maxArea.set("Max Area", 50000, 1000, 200000);
 
-	gui.add(kClusters);
-	gui.add(sampleN);
-	gui.add(useROI);
-	gui.add(showOverlay);
+	gui.add(hueRange);
+	gui.add(satRange);
+	gui.add(valRange);
+	gui.add(minArea);
+	gui.add(maxArea);
 
-	btnExtract.addListener(this, &ofApp::onExtractPalette);
-	gui.add(btnExtract.setup("extract palette"));
-
-	
-	roiSel.setDefault(100, 100, 300, 200);
+	grayMask.allocate(camWidth, camHeight);
+	maskPreview.allocate(camWidth, camHeight, OF_IMAGE_GRAYSCALE);
 }
 
 //--------------------------------------------------------------
-void ofApp::update() {}
+void ofApp::update() {
+	imgMgr.update();
+
+	if (imgMgr.isFrameNew()) {
+		processFrame();
+	}
+}
 
 //--------------------------------------------------------------
-void ofApp::draw() {
-	ofBackground(20);
+void ofApp::processFrame() {
 
-	if (!imgMgr.isLoaded()) {
-		ofSetColor(220);
-		ofDrawBitmapString("Press L to load an image.", 20, 40);
-		ofSetColor(255);
-		gui.draw();
+	const ofPixels & pixels = imgMgr.getPixels();
+
+	frameRgb = cv::Mat(camHeight, camWidth, CV_8UC3, (void *)pixels.getData()).clone();
+	cv::cvtColor(frameRgb, frameHsv, cv::COLOR_RGB2HSV);
+
+	if (!hasSelectedColor) {
+		mask = cv::Mat::zeros(camHeight, camWidth, CV_8UC1);
+		maskFiltered = mask.clone();
+		maskPreview.setFromPixels(mask.data, camWidth, camHeight, OF_IMAGE_GRAYSCALE);
 		return;
 	}
 
-	
-	imgMgr.draw(0, 0);
+	cv::Vec3b hsv = getSelectedHSV();
 
+	int h = hsv[0];
+	int s = hsv[1];
+	int v = hsv[2];
 
-	roiSel.setEnabled(useROI);
-	roiSel.draw();
-	
-	if (showOverlay && clusterer.hasOverlay()) {
-		ofRectangle roiUsed = clusterer.getUsedROI();
-		ofSetColor(255);
-		clusterer.getOverlay().draw(roiUsed.getX(), roiUsed.getY());
+	cv::Scalar lower1, upper1, lower2, upper2;
+	cv::Mat mask1, mask2;
+
+	int hLow = h - hueRange;
+	int hHigh = h + hueRange;
+
+	if (hLow < 0) {
+
+		lower1 = cv::Scalar(0, std::max(0, s - (int)satRange), std::max(0, v - (int)valRange));
+		upper1 = cv::Scalar(hHigh, std::min(255, s + (int)satRange), std::min(255, v + (int)valRange));
+
+		lower2 = cv::Scalar(180 + hLow, std::max(0, s - (int)satRange), std::max(0, v - (int)valRange));
+		upper2 = cv::Scalar(179, std::min(255, s + (int)satRange), std::min(255, v + (int)valRange));
+
+		cv::inRange(frameHsv, lower1, upper1, mask1);
+		cv::inRange(frameHsv, lower2, upper2, mask2);
+
+		cv::bitwise_or(mask1, mask2, mask);
 	}
 
-	
-	if (showOverlay && clusterer.hasOverlay()) {
-		ofRectangle roiUsed = clusterer.getUsedROI(); //
+	else if (hHigh > 179) {
 
-	
-		ofSetColor(255);
-		clusterer.getOverlay().draw(roiUsed.getX(), roiUsed.getY());
+		lower1 = cv::Scalar(hLow, std::max(0, s - (int)satRange), std::max(0, v - (int)valRange));
+		upper1 = cv::Scalar(179, std::min(255, s + (int)satRange), std::min(255, v + (int)valRange));
+
+		lower2 = cv::Scalar(0, std::max(0, s - (int)satRange), std::max(0, v - (int)valRange));
+		upper2 = cv::Scalar(hHigh - 179, std::min(255, s + (int)satRange), std::min(255, v + (int)valRange));
+
+		cv::inRange(frameHsv, lower1, upper1, mask1);
+		cv::inRange(frameHsv, lower2, upper2, mask2);
+
+		cv::bitwise_or(mask1, mask2, mask);
 	}
 
-	
-	if (sampler.hasHover()) {
-		ofPushStyle();
+	else {
 
-		ofSetColor(0, 180);
-		ofDrawRectangle(15, ofGetHeight() - 100, 420, 85);
+		cv::Scalar lower(hLow, std::max(0, s - (int)satRange), std::max(0, v - (int)valRange));
+		cv::Scalar upper(hHigh, std::min(255, s + (int)satRange), std::min(255, v + (int)valRange));
 
-		ofColor c = sampler.getRGB();
-		std::string rgbText =
-			"RGB: " + ofToString((int)c.r) + ", " + ofToString((int)c.g) + ", " + ofToString((int)c.b);
-
-		std::string hsvText =
-			"HSV: " + ofToString(sampler.getHue()) + ", " +
-			ofToString(sampler.getSaturation()) + ", " +
-			ofToString(sampler.getBrightness());
-
-		std::string hexText = "HEX: " + sampler.getHEX();
-
-		ofSetColor(255);
-		ofDrawBitmapString(rgbText, 25, ofGetHeight() - 75);
-		ofDrawBitmapString(hsvText, 25, ofGetHeight() - 55);
-		ofDrawBitmapString(hexText, 25, ofGetHeight() - 35);
-
-		ofSetColor(c);
-		ofDrawRectangle(360, ofGetHeight() - 92, 60, 60);
-
-		ofPopStyle();
+		cv::inRange(frameHsv, lower, upper, mask);
 	}
 
+	cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
 
-	const auto& pal = clusterer.getPalette();
-	if (!pal.empty()) {
-		float x0 = ofGetWidth() - 230;
-		float y0 = 15;
-		float sw = 40;
-		float sh = 22;
+	// Opening: remove small noise
+	cv::morphologyEx(mask, maskFiltered, cv::MORPH_OPEN, kernel);
 
-		ofPushStyle();
-		ofSetColor(255);
-		ofDrawBitmapString("palette (%):", x0, y0 + 10);
+	// Closing: fill small holes inside detected object
+	cv::morphologyEx(maskFiltered, maskFiltered, cv::MORPH_CLOSE, kernel);
 
-		for (size_t i = 0; i < pal.size(); i++) {
-			float y = y0 + 20 + (float)i * (sh + 6);
+	// Optional light blur for smoother mask edges
+	cv::GaussianBlur(maskFiltered, maskFiltered, cv::Size(5, 5), 0);
 
-			ofSetColor(pal[i].color);
-			ofDrawRectangle(x0, y, sw, sh);
+	// Convert back to binary after blur
+	cv::threshold(maskFiltered, maskFiltered, 127, 255, cv::THRESH_BINARY);
 
-			ofSetColor(255);
-			ofDrawBitmapString(ofToString(pal[i].percent, 1) + "%", x0 + sw + 10, y + 16);
-		}
-		ofPopStyle();
-	}
+	grayMask.setFromPixels(maskFiltered.data, camWidth, camHeight);
 
+	contourFinder.findContours(
+		grayMask,
+		minArea,
+		maxArea,
+		20,
+		false);
 
-	ofSetColor(255);
-	gui.draw();
+	maskPreview.setFromPixels(maskFiltered.data, camWidth, camHeight, OF_IMAGE_GRAYSCALE);
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key) {
-	if (key == 'l' || key == 'L') {
-		if (imgMgr.LoadFromDialog()) {
-			
-			roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
-		}
-	}
+cv::Vec3b ofApp::getSelectedHSV() const {
 
-		if (key == 'l' || key == 'L') {
-			if (imgMgr.LoadFromDialog()) {
-				roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
-			}
-		}
-	if (key == 'o' || key == 'O') {
-		showOverlay = !showOverlay;
-	}
-	}
+	cv::Mat rgb(1, 1, CV_8UC3);
+	rgb.at<cv::Vec3b>(0, 0) = cv::Vec3b(
+		selectedColor.r,
+		selectedColor.g,
+		selectedColor.b);
+
+	cv::Mat hsv;
+	cv::cvtColor(rgb, hsv, cv::COLOR_RGB2HSV);
+
+	return hsv.at<cv::Vec3b>(0, 0);
+}
 
 //--------------------------------------------------------------
-void ofApp::mouseMoved(int x, int y) {
-	if (!imgMgr.isLoaded()) return;
-	sampler.updateHover(imgMgr.getImage(), x, y);
+void ofApp::draw() {
+
+	ofBackground(20);
+	ofSetColor(255);
+
+	if (!imgMgr.isLoaded()) {
+		ofDrawBitmapString("Camera not initialized.", 20, 40);
+		return;
+	}
+
+	imgMgr.draw(20, 20);
+
+	// Draw bounding boxes and labels
+	ofNoFill();
+	ofSetColor(0, 255, 0);
+
+	for (int i = 0; i < contourFinder.nBlobs; i++) {
+
+		ofRectangle r = contourFinder.blobs[i].boundingRect;
+
+		ofDrawRectangle(
+			r.x + 20,
+			r.y + 20,
+			r.width,
+			r.height);
+
+		// Label
+		ofFill();
+		ofSetColor(0, 255, 0);
+
+		std::string label = "Object " + ofToString(i + 1);
+
+		ofDrawBitmapString(
+			label,
+			r.x + 20,
+			r.y + 15);
+
+		ofNoFill();
+	}
+
+	ofFill();
+
+	ofSetColor(255);
+	maskPreview.draw(700, 20);
+
+	ofDrawBitmapString("Live Camera", 20, 15);
+	ofDrawBitmapString("Mask Preview", 700, 15);
+
+	if (hasSelectedColor) {
+
+		ofDrawBitmapString("Selected Color", 700, 530);
+
+		ofSetColor(selectedColor);
+		ofDrawRectangle(700, 545, 80, 40);
+
+		ofSetColor(255);
+		ofDrawBitmapString(
+			"Objects detected: " + ofToString(contourFinder.nBlobs),
+			800,
+			570);
+	}
+
+	else {
+
+		ofSetColor(255);
+		ofDrawBitmapString(
+			"Click on the camera stream to select a color",
+			700,
+			570);
+	}
+
+	gui.draw();
+
+	ofSetColor(255);
+	ofDrawBitmapString(
+		"Press R to reset selected color",
+		20,
+		700);
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button) {
-	if (!imgMgr.isLoaded()) return;
 
-	roiSel.setEnabled(useROI);
-	roiSel.setImageBounds(imgMgr.width(), imgMgr.height());
-	roiSel.mousePressed(x, y);
+	if (x >= 20 && x < 20 + camWidth && y >= 20 && y < 20 + camHeight) {
+
+		int camX = x - 20;
+		int camY = y - 20;
+
+		selectedColor = imgMgr.getPixels().getColor(camX, camY);
+		hasSelectedColor = true;
+	}
 }
 
 //--------------------------------------------------------------
-void ofApp::mouseDragged(int x, int y, int button) {
-	roiSel.mouseDragged(x, y);
-}
+void ofApp::keyPressed(int key) {
 
-//--------------------------------------------------------------
-void ofApp::mouseReleased(int x, int y, int button) {
-	roiSel.mouseReleased();
-}
-
-//--------------------------------------------------------------
-void ofApp::onExtractPalette() {
-	if (!imgMgr.isLoaded()) return;
-
-	clusterer.setK(kClusters);
-	clusterer.setSampleN(sampleN);
-
-
-	ofRectangle roi = (useROI && roiSel.hasValidROI())
-						? roiSel.getROI()
-						: ofRectangle(0, 0, imgMgr.width(), imgMgr.height());
-
-	clusterer.compute(imgMgr.getImage(), roi);
+	if (key == 'r' || key == 'R') {
+		hasSelectedColor = false;
+	}
 }
