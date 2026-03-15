@@ -7,7 +7,7 @@ void ofApp::setup() {
 	ofSetFrameRate(30);
 	ofBackground(20);
 	
-	// ===== SETUP CAMERA MODE =====
+	
 	camMgr.setupCamera(camWidth, camHeight);
 	
 	guiCamera.setup("Camera Controls");
@@ -28,7 +28,7 @@ void ofApp::setup() {
 	grayMask.allocate(camWidth, camHeight);
 	maskPreview.allocate(camWidth, camHeight, OF_IMAGE_GRAYSCALE);
 	
-	// ===== SETUP IMAGE MODE =====
+
 	guiImage.setup("Image Controls");
 	guiImage.setPosition(15, 60);
 	
@@ -47,7 +47,7 @@ void ofApp::setup() {
 	
 	roiSel.setDefault(100, 100, 300, 200);
 	
-	// Start in camera mode by default
+	
 	switchToCameraMode();
 }
 
@@ -60,24 +60,23 @@ void ofApp::update() {
 			processCameraFrame();
 		}
 	}
-	// Image mode doesn't need continuous updates
+
 }
 
 //--------------------------------------------------------------
 void ofApp::draw() {
 	ofBackground(20);
 	
-	// Draw based on current mode
+	
 	if (currentMode == Mode::CAMERA_LIVE) {
 		if (!camMgr.isLoaded()) {
 			ofDrawBitmapString("Camera not initialized.", 20, 40);
 			return;
 		}
 		
-		// Draw camera feed
+		
 		camMgr.draw(20, 20);
 		
-		// Draw bounding boxes
 		ofNoFill();
 		ofSetColor(0, 255, 0);
 		
@@ -124,21 +123,21 @@ void ofApp::draw() {
 			return;
 		}
 		
-		// Draw image
+		
 		imgMgr.draw(0, 0);
 		
-		// Draw ROI selector
+
 		roiSel.setEnabled(useROI);
 		roiSel.draw();
 		
-		// Draw overlay if available
+		
 		if (showOverlay && clusterer.hasOverlay()) {
 			ofRectangle roiUsed = clusterer.getUsedROI();
 			ofSetColor(255);
 			clusterer.getOverlay().draw(roiUsed.getX(), roiUsed.getY());
 		}
 		
-		// Draw hover color info
+	
 		if (sampler.hasHover()) {
 			ofPushStyle();
 			ofSetColor(0, 180);
@@ -161,7 +160,7 @@ void ofApp::draw() {
 			ofPopStyle();
 		}
 		
-		// Draw palette
+	
 		const auto& pal = clusterer.getPalette();
 		if (!pal.empty()) {
 			float x0 = ofGetWidth() - 230;
@@ -186,21 +185,21 @@ void ofApp::draw() {
 		guiImage.draw();
 	}
 	
-	// Draw common UI elements
+	
 	drawModeIndicator();
 	drawInstructions();
 }
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key) {
-	// Global mode switching
+	
 	if (key == '1') {
 		switchToCameraMode();
 	} else if (key == '2') {
 		switchToImageMode();
 	}
 	
-	// Mode-specific keys
+	
 	if (currentMode == Mode::CAMERA_LIVE) {
 		if (key == 'r' || key == 'R') {
 			hasSelectedColor = false;
@@ -229,7 +228,7 @@ void ofApp::mouseMoved(int x, int y) {
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button) {
 	if (currentMode == Mode::CAMERA_LIVE) {
-		// Color selection in camera mode
+		
 		if (x >= 20 && x < 20 + camWidth && y >= 20 && y < 20 + camHeight) {
 			int camX = x - 20;
 			int camY = y - 20;
@@ -262,14 +261,15 @@ void ofApp::mouseReleased(int x, int y, int button) {
 //--------------------------------------------------------------
 void ofApp::switchToCameraMode() {
 	currentMode = Mode::CAMERA_LIVE;
-	camMgr.setupCamera(camWidth, camHeight);  // Reinitialize if needed
+	camMgr.setupCamera(camWidth, camHeight);
+	
 	ofLogNotice() << "Switched to Camera Mode (Press 1 for camera, 2 for images)";
 }
 
 //--------------------------------------------------------------
 void ofApp::switchToImageMode() {
 	currentMode = Mode::IMAGE_STATIC;
-	camMgr = ImageManager_live();  // Reset camera (optional)
+	camMgr = ImageManager_live();
 	ofLogNotice() << "Switched to Image Mode (Press 1 for camera, 2 for images)";
 }
 

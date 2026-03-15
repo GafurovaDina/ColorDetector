@@ -24,19 +24,19 @@ public:
 	void mouseReleased(int x, int y, int button) override;
 
 private:
-	// Mode enumeration
+	
 	enum class Mode {
 		CAMERA_LIVE,
 		IMAGE_STATIC
 	};
 	Mode currentMode = Mode::CAMERA_LIVE;
 	
-	// Mode switching methods
+	
 	void switchToCameraMode();
 	void switchToImageMode();
 	void drawModeIndicator();
 	
-	// ===== IMAGE MODE COMPONENTS (from image version) =====
+
 	ImageManager imgMgr;
 	ROISelector roiSel;
 	ColorSampler sampler;
