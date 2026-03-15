@@ -12,9 +12,10 @@
 		"2D9CD335-34D1-4159-8201-458C7B9DE17B" /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "04637EE4-DC94-4FB7-932F-94051C1A2A65" /* ofxSlider.cpp */; };
 		"2EFAE40A-BAA2-47CD-ACC6-3D4A207A691F" /* ofxCvContourFinder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "831D4363-BE12-4F5B-A8B0-766584103E59" /* ofxCvContourFinder.cpp */; };
 		335007A02F5F2CB600A2E975 /* ImageManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3350079F2F5F2CAA00A2E975 /* ImageManager.cpp */; };
-		335007A32F5F2CD300A2E975 /* ROISelector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335007A22F5F2CD000A2E975 /* ROISelector.cpp */; };
-		335007A62F5F2CE700A2E975 /* ColorSampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335007A52F5F2CE500A2E975 /* ColorSampler.cpp */; };
-		335007A92F5F2CFD00A2E975 /* ColorClusterer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 335007A82F5F2CF800A2E975 /* ColorClusterer.cpp */; };
+		33E4CC162F66BC4D005CFA5F /* ROISelector.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E4CC152F66BC4D005CFA5F /* ROISelector.cpp */; };
+		33E4CC172F66BC4D005CFA5F /* ImageManager_live.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E4CC132F66BC4D005CFA5F /* ImageManager_live.cpp */; };
+		33E4CC182F66BC4D005CFA5F /* ColorClusterer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E4CC0F2F66BC4D005CFA5F /* ColorClusterer.cpp */; };
+		33E4CC192F66BC4D005CFA5F /* ColorSampler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 33E4CC112F66BC4D005CFA5F /* ColorSampler.cpp */; };
 		"35382FEF-AECE-44CE-B8AC-81AF768C5916" /* ofxGuiGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "801B6906-4A52-4627-919F-0AEB314B47E0" /* ofxGuiGroup.cpp */; };
 		"3D9D2AE6-DF65-4D61-BFEA-36D907B7C519" /* ofxCvColorImage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "E632907F-8FA7-4CCD-BBC7-DD9D7AC12B3B" /* ofxCvColorImage.cpp */; };
 		"559B1AE5-052F-4114-9D4C-B724C15FBBC6" /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = "C51C8216-F987-4E30-AE95-683DF20E7929" /* ofxBaseGui.cpp */; };
@@ -266,16 +267,15 @@
 		"3344124A-7ED8-48CD-A584-5261D575009A" /* warpers.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = warpers.hpp; sourceTree = "<group>"; };
 		3350079C2F5F2BA700A2E975 /* ImageManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageManager.h; sourceTree = "<group>"; };
 		3350079F2F5F2CAA00A2E975 /* ImageManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ImageManager.cpp; sourceTree = "<group>"; };
-		335007A12F5F2CC400A2E975 /* ROISelector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ROISelector.h; sourceTree = "<group>"; };
-		335007A22F5F2CD000A2E975 /* ROISelector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ROISelector.cpp; sourceTree = "<group>"; };
-		335007A42F5F2CD900A2E975 /* ColorSampler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorSampler.h; sourceTree = "<group>"; };
-		335007A52F5F2CE500A2E975 /* ColorSampler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ColorSampler.cpp; sourceTree = "<group>"; };
-		335007A72F5F2CEE00A2E975 /* ColorClusterer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorClusterer.h; sourceTree = "<group>"; };
-		335007A82F5F2CF800A2E975 /* ColorClusterer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ColorClusterer.cpp; sourceTree = "<group>"; };
-		335007AA2F5F2D0C00A2E975 /* ColorUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorUtils.h; sourceTree = "<group>"; };
-		335007AD2F5F2D3800A2E975 /* BoundaryDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BoundaryDetector.h; sourceTree = "<group>"; };
-		335007AE2F5F2D4800A2E975 /* ObjectAnalyzer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ObjectAnalyzer.h; sourceTree = "<group>"; };
 		"339EA88B-E7BE-4901-9DCE-FB704C99BF8C" /* warp_reduce.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = warp_reduce.hpp; sourceTree = "<group>"; };
+		33E4CC0E2F66BC4D005CFA5F /* ColorClusterer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorClusterer.h; sourceTree = "<group>"; };
+		33E4CC0F2F66BC4D005CFA5F /* ColorClusterer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ColorClusterer.cpp; sourceTree = "<group>"; };
+		33E4CC102F66BC4D005CFA5F /* ColorSampler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorSampler.h; sourceTree = "<group>"; };
+		33E4CC112F66BC4D005CFA5F /* ColorSampler.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ColorSampler.cpp; sourceTree = "<group>"; };
+		33E4CC122F66BC4D005CFA5F /* ImageManager_live.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageManager_live.h; sourceTree = "<group>"; };
+		33E4CC132F66BC4D005CFA5F /* ImageManager_live.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ImageManager_live.cpp; sourceTree = "<group>"; };
+		33E4CC142F66BC4D005CFA5F /* ROISelector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ROISelector.h; sourceTree = "<group>"; };
+		33E4CC152F66BC4D005CFA5F /* ROISelector.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ROISelector.cpp; sourceTree = "<group>"; };
 		"34BB61AE-A093-41FB-9FE1-2D24EB0EABDD" /* ground_truth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ground_truth.h; sourceTree = "<group>"; };
 		"34C09A11-B6BD-4CF7-AC9E-4F93FD11BBE1" /* intrin_sse_em.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = intrin_sse_em.hpp; sourceTree = "<group>"; };
 		"34DE967F-EA09-4596-A88A-D585EB6A33DE" /* opencl_info.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = opencl_info.hpp; sourceTree = "<group>"; };
@@ -2841,15 +2841,14 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				335007AE2F5F2D4800A2E975 /* ObjectAnalyzer.h */,
-				335007AD2F5F2D3800A2E975 /* BoundaryDetector.h */,
-				335007AA2F5F2D0C00A2E975 /* ColorUtils.h */,
-				335007A82F5F2CF800A2E975 /* ColorClusterer.cpp */,
-				335007A72F5F2CEE00A2E975 /* ColorClusterer.h */,
-				335007A52F5F2CE500A2E975 /* ColorSampler.cpp */,
-				335007A42F5F2CD900A2E975 /* ColorSampler.h */,
-				335007A22F5F2CD000A2E975 /* ROISelector.cpp */,
-				335007A12F5F2CC400A2E975 /* ROISelector.h */,
+				33E4CC0E2F66BC4D005CFA5F /* ColorClusterer.h */,
+				33E4CC0F2F66BC4D005CFA5F /* ColorClusterer.cpp */,
+				33E4CC102F66BC4D005CFA5F /* ColorSampler.h */,
+				33E4CC112F66BC4D005CFA5F /* ColorSampler.cpp */,
+				33E4CC122F66BC4D005CFA5F /* ImageManager_live.h */,
+				33E4CC132F66BC4D005CFA5F /* ImageManager_live.cpp */,
+				33E4CC142F66BC4D005CFA5F /* ROISelector.h */,
+				33E4CC152F66BC4D005CFA5F /* ROISelector.cpp */,
 				3350079F2F5F2CAA00A2E975 /* ImageManager.cpp */,
 				3350079C2F5F2BA700A2E975 /* ImageManager.h */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
@@ -3447,10 +3446,12 @@
 				E4B69E210A3A1BDC003C02F2 /* ofApp.cpp in Sources */,
 				"559B1AE5-052F-4114-9D4C-B724C15FBBC6" /* ofxBaseGui.cpp in Sources */,
 				"E3352C11-72F3-49D4-8529-C15625A49266" /* ofxButton.cpp in Sources */,
+				33E4CC162F66BC4D005CFA5F /* ROISelector.cpp in Sources */,
+				33E4CC172F66BC4D005CFA5F /* ImageManager_live.cpp in Sources */,
+				33E4CC182F66BC4D005CFA5F /* ColorClusterer.cpp in Sources */,
+				33E4CC192F66BC4D005CFA5F /* ColorSampler.cpp in Sources */,
 				"164780D9-DD3E-4545-A5D0-114EEA399526" /* ofxColorPicker.cpp in Sources */,
 				"35382FEF-AECE-44CE-B8AC-81AF768C5916" /* ofxGuiGroup.cpp in Sources */,
-				335007A62F5F2CE700A2E975 /* ColorSampler.cpp in Sources */,
-				335007A32F5F2CD300A2E975 /* ROISelector.cpp in Sources */,
 				"AB563936-26C2-4D12-BF95-C16B79D104ED" /* ofxInputField.cpp in Sources */,
 				"97C4EC5D-8E60-41E7-BF0C-FADC835CF783" /* ofxLabel.cpp in Sources */,
 				"5D7D50CC-503A-4532-AA79-6A38E610FE20" /* ofxPanel.cpp in Sources */,
@@ -3462,7 +3463,6 @@
 				"988684E8-4F18-4F19-920E-65CC66A1AC7F" /* ofxCvFloatImage.cpp in Sources */,
 				"DE1FC2C1-96C8-41F0-A173-6CC66F7B4A70" /* ofxCvGrayscaleImage.cpp in Sources */,
 				"80B752AD-CF5F-49C9-8168-33FA5F5724D0" /* ofxCvHaarFinder.cpp in Sources */,
-				335007A92F5F2CFD00A2E975 /* ColorClusterer.cpp in Sources */,
 				"99855A53-010D-4EF0-810B-5816ED898029" /* ofxCvImage.cpp in Sources */,
 				"FEA2848F-7812-4D7B-92BA-A50A41BB45C2" /* ofxCvShortImage.cpp in Sources */,
 				335007A02F5F2CB600A2E975 /* ImageManager.cpp in Sources */,

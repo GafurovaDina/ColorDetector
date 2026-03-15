@@ -95,16 +95,26 @@ bool ColorClusterer::compute(const ofImage& img, const ofRectangle& roiIn) {
 	ofPixels& opix = overlay.getPixels();
 
 	std::vector<ofColor> displayColors = {
-			ofColor(255,   0,   0, 220), // red
-			ofColor(  0, 255,   0, 220), // green
-			ofColor(  0,   0, 255, 220), // blue
-			ofColor(255, 255,   0, 220), // yellow
-			ofColor(255,   0, 255, 220), // magenta
-			ofColor(  0, 255, 255, 220), // cyan
-			ofColor(255, 128,   0, 220), // orange
-			ofColor(128,   0, 255, 220), // purple
-			ofColor(  0, 128, 255, 220), // sky
-			ofColor(128, 255,   0, 220)  // lime
+		    ofColor(230, 140, 140, 160),  // soft coral
+			ofColor(140, 210, 140, 160),  // soft sage
+			ofColor(140, 170, 230, 160),  // soft periwinkle
+			ofColor(230, 210, 120, 160),  // soft honey
+			ofColor(200, 140, 210, 160),  // soft orchid
+			ofColor(120, 200, 210, 160),  // soft turquoise
+			ofColor(230, 170, 120, 160),  // soft apricot
+			ofColor(180, 140, 210, 160),  // soft lavender
+			ofColor(140, 190, 210, 160),  // soft sky
+			ofColor(170, 200, 140, 160)   // soft celery
+			//ofColor(255,   0,   0, 80), // red
+			//ofColor(  0, 255,   0, 80), // green
+			//ofColor(  0,   0, 255, 80), // blue
+			//ofColor(255, 255,   0, 80), // yellow
+			//ofColor(255,   0, 255, 80), // magenta
+			//ofColor(  0, 255, 255, 80), // cyan
+			//ofColor(255, 128,   0, 80), // orange
+			//ofColor(128,   0, 255, 80), // purple
+			//ofColor(  0, 128, 255, 80), // sky
+			//ofColor(128, 255,   0, 80)  // lime
 		};
 	
 	for (int y = 0; y < bgrROI.rows; y++) {
@@ -126,7 +136,6 @@ bool ColorClusterer::compute(const ofImage& img, const ofRectangle& roiIn) {
 			counts[bestK]++;
 			
 			ofColor oc = displayColors[bestK % displayColors.size()];
-					 oc.a = 220;
 					 opix.setColor(x, y, oc);
 		}
 	}

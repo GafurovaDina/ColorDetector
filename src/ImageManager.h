@@ -1,21 +1,25 @@
+//
+//  ImageManager.h
+//  ColorDetector
+//
+//  Created by Dina Gafurova on 09/03/2026.
+//
+
 #pragma once
 #include "ofMain.h"
-
 class ImageManager {
 public:
-	bool setupCamera(int width = 640, int height = 480);
-	void update();
+	bool LoadFromDialog();
+	bool LoadFromPath(const std::string& path);
+	
+	bool isLoaded() const { return loaded; }
+	int width() const { return loaded ? img.getWidth() :0; }
+	int height() const { return loaded ? img.getHeight() :0; }
 	void draw(float x = 0, float y = 0) const;
-
-	bool isLoaded() const { return initialized; }
-	bool isFrameNew() const { return initialized && cam.isFrameNew(); }
-
-	int width() const { return initialized ? cam.getWidth() : 0; }
-	int height() const { return initialized ? cam.getHeight() : 0; }
-
-	const ofPixels & getPixels() const { return cam.getPixels(); }
-
+	
+	const ofImage& getImage() const {return img; }
+	
 private:
-	ofVideoGrabber cam;
-	bool initialized = false;
+	ofImage img;
+	bool loaded = false;
 };
